@@ -1,6 +1,6 @@
 const { ipcRenderer, contextBridge } = require('electron');
-const fs = require('fs');
 
+const state = { test: 'hello world' };
 contextBridge.exposeInMainWorld('electron', {
   notificationApi: {
     sendNotification(message) {
@@ -9,13 +9,11 @@ contextBridge.exposeInMainWorld('electron', {
   },
   batteryApi: {},
   filesApi: {
-    openFile(path) {
-      try {
-        const data = fs.readFileSync(path, 'utf8');
-        console.log(data);
-      } catch (err) {
-        console.error(err);
-      }
+    openFile(key, value) {
+      state[key] = value;
     },
+  },
+  get(key) {
+    return state[key];
   },
 });

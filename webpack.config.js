@@ -7,6 +7,7 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     filename: 'app.js',
   },
+  target: 'electron-renderer',
   devtool: 'cheap-module-source-map',
   module: {
     rules: [
