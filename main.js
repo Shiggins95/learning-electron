@@ -1,10 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const path = require('path');
+const express = require('express');
 const preload = require('electron-reload');
 const {
   BrowserWindow,
   app,
   ipcMain,
+  ipcRenderer,
   Notification,
 } = require('electron');
 
@@ -31,14 +33,23 @@ async function createWindow() {
       worldSafeExecuteJavaScript: true,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
+      nativeWindowOpen: false,
     },
   });
 
   await window.loadFile('./index.html');
-}
 
-ipcMain.on('notify', (event, message) => {
-  new Notification({ title: 'Notification', body: message }).show();
-});
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('about:blank')) {
+      return { action: 'allow' };
+    }
+    return { action: 'deny' };
+  });
+
+  window.webContents.on('did-create-window', (childWindow) => {
+    childWindow.on('closed', () => {});
+  });
+  ipcMain.on('test', () => 'test');
+}
 
 app.whenReady().then(createWindow);
